@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const express = require('express');
+const cTable = require('console.table');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -21,16 +22,23 @@ const db = mysql.createConnection(
   );
 
 
-
-app.get('/', (req, res) => {
-    res.json({
-      message: 'Hello World'
+// Get all candidates
+app.get('/api/employee', (req, res) => {
+    const sql = `SELECT * FROM employee`;
+  
+    db.query(sql, (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({
+        message: 'success',
+        data: rows
+      });
     });
   });
 
-  db.query(`SELECT * FROM employee`, (err, rows) => {
-    console.log(rows);
-  });
+  console.table(['first_name', 'last_name'], values);
 
 
 // Default response for any other request (Not Found)
