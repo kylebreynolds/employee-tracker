@@ -125,18 +125,29 @@ function addEmployee() {
         message: 'What is the employees last name?',
         name: 'lastName'
       },
+      {
+        type:'input',
+        message: 'What is the employees role?',
+        name: 'role'
+      },
+      {
+        type:'input',
+        message: 'Who is the employees manager?',
+        name: 'managerName'
+      }
    ])
-   //.then(function (response) {
-     // addEmployees(response)
-   // })
+   .then(function (response) {
+      addEmployees(response)
+    })
 }
 
-//function addEmployees(data) {
- // connection.query('INSERT INTO employee SET ?',
- // {
- //   first_name: data.firstName,
- //   last_name: data.lastName,
- //   role_id: ,
- // })
-  
-//}
+function addEmployees(data) {
+ connection.query('INSERT INTO employee SET ?',
+  {
+    first_name: data.firstName,
+    last_name: data.lastName,
+    role_id: data.role,
+    manager_id: data.managerName
+  })
+  questions();
+}
