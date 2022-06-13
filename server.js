@@ -1,56 +1,139 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
-const express = require('express');
 const cTable = require('console.table');
 
-const PORT = process.env.PORT || 3001;
-const app = express();
 
-// Express middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
 
 // Connect to database
-const db = mysql.createConnection(
+const connection = mysql.createConnection(
     {
       host: 'localhost',
       user: 'root',
       password: 'Kr_9378a',
       database: 'employee_db'
     },
-    console.log('Connected to the employee database.')
+    console.log('Connected to the employee database.'),
   );
 
 
-// Get all candidates
-app.get('/api/employee', (req, res) => {
-    const sql = `SELECT * FROM employee`;
+  var showroles;
+  var showdepartments;
+  var showemployees;
   
-    db.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: 'success',
-        data: rows
-      });
-    });
-  });
-
-  console.table(['first_name', 'last_name'], values);
-
-
-// Default response for any other request (Not Found)
-app.use((req, res) => {
-    res.status(404).end();
-  });
-
-
-
+  // mysql connection
+  connection.connect(function (err) {
+    
+    if (err) {
+      console.error("error connecting: " + err.stack);
+      return;
+    }
+  
+    connection.query("SELECT * from role", function (error, res) {
+      showroles = res.map(role => ({ name: role.title, value: role.id }))
+    })
+    connection.query("SELECT * from department", function (error, res) {
+      showdepartments = res.map(dep => ({ name: dep.name, value: dep.id }))
+    })
+    connection.query("SELECT * from employee", function (error, res) {
+      showemployees = res.map(emp => ({ name: `${emp.first_name} ${emp.last_name}`, value: emp.id }))
+    })
+  
+    questions();
+  })
 
 
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+
+
+// INQUIRER menu of questions
+function questions() {
+  inquirer
+    .prompt(
+      {
+        type: "list",
+        message: "What would you like to do?",
+        name: "choices",
+        choices: [
+          {
+            name: "View All Employees",
+            value: "viewEmployees"
+          },
+          {
+            name: "Add Employee",
+            value: "addEmployee"
+          },
+          {
+            name: "Update Employee Role",
+            value: "updateRole"
+          },
+          {
+            name: "View All Roles",
+            value: "viewRoles"
+          },
+          {
+            name: "Add Role",
+            value: "addRole"
+          },
+          {
+            name: "View All Departments",
+            value: "viewDepartments"
+          },
+          {
+            name: "Add Department",
+            value: "addDept"
+          },
+        ]
+      }).then(function (res) {
+      menu(res.choices)
+    })
+}
+
+function menu(option) {
+  switch (option) {
+    case "viewEmployees":
+      viewEmployees();
+      break;
+    case "addEmployee":
+      addEmployee();
+      break;
+    case "updateRole":
+      updateRole();
+    case "viewRoles":
+      viewRoles();
+      break;
+    case "addRole":
+      addRole();
+      break;  
+    case "viewDepartments":
+      viewDepartments();
+      break;
+    case "addDept":
+      addDept();
+      break;
+  }
+}
+
+// View db
+
+function viewEmployees() {
+  connection.query("SELECT * FROM employee", function (err, data) {
+    console.table(data);
+    questions();
+  })
+}
+
+function viewDepartments() {
+  connection.query("SELECT * FROM department", function (err, data) {
+    console.table(data);
+    questions();
+  })
+}
+
+function viewRoles() {
+  connection.query("SELECT * FROM role", function (err, data) {
+    console.table(data);
+    questions();
+  })
+}
+
+// Add to db
