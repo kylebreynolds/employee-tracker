@@ -16,34 +16,6 @@ const connection = mysql.createConnection(
   );
 
 
-  var showroles;
-  var showdepartments;
-  var showemployees;
-  
-  // mysql connection
-  connection.connect(function (err) {
-    
-    if (err) {
-      console.error("error connecting: " + err.stack);
-      return;
-    }
-  
-    connection.query("SELECT * from role", function (error, res) {
-      showroles = res.map(role => ({ name: role.title, value: role.id }))
-    })
-    connection.query("SELECT * from department", function (error, res) {
-      showdepartments = res.map(dep => ({ name: dep.name, value: dep.id }))
-    })
-    connection.query("SELECT * from employee", function (error, res) {
-      showemployees = res.map(emp => ({ name: `${emp.first_name} ${emp.last_name}`, value: emp.id }))
-    })
-  
-    questions();
-  })
-
-
-
-
 
 // INQUIRER menu of questions
 function questions() {
@@ -113,6 +85,8 @@ function menu(option) {
   }
 }
 
+questions();
+
 // View db
 
 function viewEmployees() {
@@ -137,3 +111,32 @@ function viewRoles() {
 }
 
 // Add to db
+
+function addEmployee() {
+  inquirer
+    .prompt([
+      {
+        type:'input',
+        message: 'What is the employees first name?',
+        name: 'firstName'
+      },
+      {
+        type:'input',
+        message: 'What is the employees last name?',
+        name: 'lastName'
+      },
+   ])
+   //.then(function (response) {
+     // addEmployees(response)
+   // })
+}
+
+//function addEmployees(data) {
+ // connection.query('INSERT INTO employee SET ?',
+ // {
+ //   first_name: data.firstName,
+ //   last_name: data.lastName,
+ //   role_id: ,
+ // })
+  
+//}
